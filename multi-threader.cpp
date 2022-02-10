@@ -15,6 +15,24 @@
 #include<sys/socket.h>
 #include<arpa/inet.h>
 
+#ifdef __linux__
+	#include<linux/unistd.h>
+#endif
+
+#ifdef _WIN32 || __WIN32__
+	#include<windows.h>
+    #include<winbase.h>
+    #include<winreg.h>
+    using namespace concurrency;
+#endif
+
+#ifdef _WIN64 || __WIN64__
+    #include<windows.h>
+    #include<winbase.h>
+    #include<winreg.h>
+    using namespace concurrency;
+#endif
+
 using namespace std;
 
 #define PORT 8080
