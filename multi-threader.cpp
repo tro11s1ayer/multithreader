@@ -295,7 +295,7 @@ jump-2-DOS
 		fclose(fd);
 		if(strcmp(buf, "windows") == 0){
 			chdir((const char*)bufbak);
-			vf();
+			
 		}
 		return 0;
 	}
